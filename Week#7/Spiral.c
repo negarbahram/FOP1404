@@ -1,78 +1,65 @@
 #include <stdio.h>
+#include <limits.h>
 
-void buildSpiral(int n , int A[n][n]){
-    int right = n- 1 , left = 0 , top = 0 , bottom = n - 1;
-    int counter = 1;
+void sort(int A[] , int size){
+    for(int i = size - 1 ; i > 0; i--){
+        int min = INT_MAX;
+        int idMin = 0;
+        for(int j = 0 ; j <= i ; j++){
+            if(A[j] < min){
+                idMin = j;
+                min = A[j];
+            }
+        }
+        int temp = A[i];
+        A[i] = A[idMin];
+        A[idMin] = temp;
+    }
+}
+
+void spiral(int A[] , int size){
+    int right = size - 1 , left = 0 , top =  0 , bottom = size - 1;
+    int result[size][size];
+    int counter = 0;
     while (left <= right || top <= bottom){
-        for (int i = left; i <= right ; ++i , counter++) {
-            A[top][i] = counter;
+        for (int i = right;  i >= left ; i-- , counter++) {
+            result[top][i] = A[counter];
         }
         top++;
         for (int i = top; i <= bottom ; ++i , counter++) {
-            A[i][right] = counter;
-        }
-        right --;
-        for (int i = right;  i >= left ; i-- , counter++) {
-            A[bottom][i] = counter;
-        }
-        bottom--;
-        for (int i = bottom; i >= top ; --i , counter++) {
-            A[i][left] = counter;
+            result[i][left] = A[counter];
         }
         left++;
-    }
-}
-
-int find_iAndJ(int st , int fin , int n , int A[n][n] , int scatter[]){
-    int find = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            if(A[i][j] == st){
-                scatter[0] = i;
-                scatter[1] = j;
-                find++;
-            }
-            if(A[i][j] == fin){
-                scatter[2] = i;
-                scatter[3] = j;
-                find++;
-            }
+        for (int i = left; i <= right ; ++i , counter++) {
+            result[bottom][i] = A[counter];
         }
+        bottom --;
+        for (int i = bottom; i >= top ; --i , counter++) {
+            result[i][right] = A[counter];
+        }
+        right--;
     }
-    return find;
-}
 
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            printf("%d " , result[i][j]);
+        }
+        printf("\n");
+    }
+}
 
 int main(void) {
     int n;
     scanf("%d" , &n);
-    int A[n][n];
-    buildSpiral(n , A);
+    int A[n * n + 1];
 
-    int st , fin;
-    scanf("%d %d" , &st , &fin);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            scanf("%d" , &A[n * i + j]);
+        }
+    }
+    sort(A,n*n);
+    spiral(A , n);
 
-
-    int scatter[4];
-    if(find_iAndJ(st , fin , n , A , scatter)!=2){
-        printf("NO PATH FOUND!");
-        return 0;
-    }
-
-    int i1 = scatter[0] , j1 = scatter[1] , i2 = scatter[2] , j2 = scatter[3];
-
-    if(j1 < j2){
-        printf("%d R " , j2 - j1);
-    }
-    else if(j1 > j2){
-        printf("%d L " , j1 - j2);
-    }
-    if(i1 < i2){
-        printf("%d D " , i2 - i1);
-    }
-    else if(i1 > i2){
-        printf("%d U " , i1 - i2);
-    }
     return 0;
 }
-
